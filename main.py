@@ -1,9 +1,10 @@
 import argparse
-import re
-from docx import Document
+from docx import Document # todo check how to satisfy requirements.txt
 import subprocess
+import re
 from PyPDF2 import PdfReader, PdfWriter
 import os
+import datetime
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -19,11 +20,25 @@ def get_args():
 def edit_docx(template, article_number, logo):
     doc = Document(template)
 
+    # get today's date in the format dd.mm.yyyy
+    today = datetime.date.today().strftime("%d.%m.%Y")
+
     for paragraph in doc.paragraphs:
         if "Article number" in paragraph.text:
             paragraph.text = re.sub('Article number', article_number, paragraph.text)
 
-    for rel in doc.part.rels.values():
+        if "xx.xx.xxxx" in paragraph.text: # bug: does only work on a free paragraph, not nested
+            print("found in paragraph")
+            paragraph.text = re.sub('xx.xx.xxxx', today, paragraph.text)
+
+        # if "xx.xx.xxxx" in paragraph.text:
+        #     print("found in paragraph2")
+        #     for run in paragraph.runs:
+        #         if "xx.xx.xxxx" in run.text:
+        #             print("  found in run")
+        #             run.text = run.text.replace("xx.xx.xxxx", today)
+
+    for rel in doc.part.rels.values(): # bug: does not work yet
         if "Logo" in rel.reltype:
             rel.reltype = logo
 
@@ -75,7 +90,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-# python3 main.py --template=template_front_and_back.docx --articleNumber=3.1415 --logo=fancy_logo.png --manufacturerSpec=manufacturer_spec.pdf
+# time python3 main.py --template=template_front_and_back.docx --articleNumber=3.1415 --logo=fancy_logo.png --manufacturerSpec=manufacturer_spec.pdf
 
 
 # javaldx: Could not find a Java Runtime Environment!
