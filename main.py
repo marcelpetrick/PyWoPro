@@ -5,6 +5,7 @@ from docx import Document
 from docx2pdf import convert
 from PyPDF2 import PdfFileMerger, PdfFileReader
 from PIL import Image
+import subprocess
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -30,8 +31,19 @@ def edit_docx(template, article_number, logo):
 
     doc.save('modified.docx')
 
-def convert_to_pdf():
-    convert('modified.docx', 'modified.pdf')
+# needs Word ..
+# def convert_to_pdf():
+#     convert('modified.docx', 'modified.pdf')
+
+import subprocess
+
+def convert_to_pdf(docx_file, pdf_file):
+    command = f'libreoffice --headless --convert-to pdf:writer_pdf_Export --outdir . {docx_file}'
+    subprocess.run(command, shell=True, stdout=subprocess.DEVNULL)
+
+    # rename the output file
+    default_pdf_file = docx_file.replace('.docx', '.pdf')
+    subprocess.run(f'mv {default_pdf_file} {pdf_file}', shell=True)
 
 def split_pdf(manufacturer_spec, article_number):
     inputpdf = PdfFileReader(open("modified.pdf", "rb"))
@@ -55,7 +67,7 @@ def split_pdf(manufacturer_spec, article_number):
 def main():
     template, article_number, logo, manufacturer_spec = get_args()
     edit_docx(template, article_number, logo)
-    convert_to_pdf()
+    convert_to_pdf('modified.docx', 'modified.pdf')
     split_pdf(manufacturer_spec, article_number)
 
 if __name__ == "__main__":
