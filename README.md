@@ -4,6 +4,7 @@
 * small helper to take a given word-template where certain fields should be replaced with specified data (text and images)
 * then convert the very first page of the template to PDF as well as the second one
 * combine it with a given additional manufacturer-spec-pdf into a single PDF which should use a distinct name-scheme
+![](flow.png)
 
 ## Future development / known bugs
 * placement & placeholder naming should be discussed - easily identifiable fields are better for parsing
