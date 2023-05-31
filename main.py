@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 from docx import Document
+from docx.shared import Inches
 from PyPDF2 import PdfReader, PdfWriter
 
 
@@ -40,9 +41,14 @@ def edit_docx(template, article_number, logo):
         #             print("  found in run")
         #             run.text = run.text.replace("xx.xx.xxxx", today)
 
-    for rel in doc.part.rels.values(): # bug: does not work yet
-        if "Logo" in rel.reltype:
-            rel.reltype = logo
+        # working replacement
+        if "LOGO_PLACEHOLDER" in paragraph.text:
+            # remove placeholder text
+            for run in paragraph.runs:
+                if "LOGO_PLACEHOLDER" in run.text:
+                    run.text = run.text.replace("LOGO_PLACEHOLDER", '')
+            # add image
+            paragraph.add_run().add_picture(logo, width=Inches(1.0))
 
     doc.save('modified.docx')
 
