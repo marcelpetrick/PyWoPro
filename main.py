@@ -31,7 +31,6 @@ def edit_docx(template, article_number, logo):
             paragraph.text = re.sub('Article number', article_number, paragraph.text)
 
         if "xx.xx.xxxx" in paragraph.text: # bug: does only work on a free paragraph, not nested
-            print("found in paragraph")
             paragraph.text = re.sub('xx.xx.xxxx', today, paragraph.text)
 
         # if "xx.xx.xxxx" in paragraph.text:
