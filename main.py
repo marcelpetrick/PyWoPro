@@ -1,12 +1,9 @@
-import sys
 import argparse
 import re
 from docx import Document
-from docx2pdf import convert
-from PyPDF2 import PdfFileMerger, PdfFileReader
-from PIL import Image
 import subprocess
 from PyPDF2 import PdfReader, PdfWriter
+import os
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -32,17 +29,9 @@ def edit_docx(template, article_number, logo):
 
     doc.save('modified.docx')
 
-# needs Word ..
-# def convert_to_pdf():
-#     convert('modified.docx', 'modified.pdf')
-
-def convert_to_pdf(docx_file, pdf_file):
+def convert_to_pdf(docx_file):
     command = f'libreoffice --headless --convert-to pdf:writer_pdf_Export --outdir . {docx_file}'
     subprocess.run(command, shell=True, stdout=subprocess.DEVNULL)
-
-    # rename the output file
-    #default_pdf_file = docx_file.replace('.docx', '.pdf')
-    #subprocess.run(f'mv {default_pdf_file} {pdf_file}', shell=True)
 
 def split_pdf(manufacturer_spec, article_number):
     inputpdf = PdfReader("modified.pdf")
@@ -64,11 +53,21 @@ def split_pdf(manufacturer_spec, article_number):
     with open(f"Spec_{article_number}.pdf", "wb") as outputStream:
         output.write(outputStream)
 
+def cleanup():
+    files_to_delete = ['modified.pdf', 'modified.docx', 'front.pdf', 'back.pdf']
+    for filename in files_to_delete:
+        try:
+            os.remove(filename)
+        except FileNotFoundError:
+            print(f"File {filename} not found.")
+
+
 def main():
     template, article_number, logo, manufacturer_spec = get_args()
     edit_docx(template, article_number, logo)
-    convert_to_pdf('modified.docx', 'modified.pdf')
+    convert_to_pdf('modified.docx')
     split_pdf(manufacturer_spec, article_number)
+    cleanup()
 
 if __name__ == "__main__":
     main()
