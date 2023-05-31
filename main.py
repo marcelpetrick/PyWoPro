@@ -33,6 +33,7 @@ def convert_to_pdf(docx_file):
     command = f'libreoffice --headless --convert-to pdf:writer_pdf_Export --outdir . {docx_file}'
     subprocess.run(command, shell=True, stdout=subprocess.DEVNULL)
 
+
 def split_pdf(manufacturer_spec, article_number):
     inputpdf = PdfReader("modified.pdf")
 
@@ -48,8 +49,10 @@ def split_pdf(manufacturer_spec, article_number):
 
     output = PdfWriter()
     output.add_page(PdfReader("front.pdf").pages[0])
-    output.add_page(PdfReader(manufacturer_spec).pages[0])
+    for page in PdfReader(manufacturer_spec).pages:
+        output.add_page(page)
     output.add_page(PdfReader("back.pdf").pages[0])
+
     with open(f"Spec_{article_number}.pdf", "wb") as outputStream:
         output.write(outputStream)
 
