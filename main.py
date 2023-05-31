@@ -8,10 +8,10 @@ from PIL import Image
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("template", help="Template DOCX file")
-    parser.add_argument("articleNumber", help="Article number to be replaced in the DOCX file")
-    parser.add_argument("logo", help="Logo PNG file to be replaced in the DOCX file")
-    parser.add_argument("manufacturerSpec", help="Manufacturer spec PDF file")
+    parser.add_argument("--template", help="Template DOCX file", required=True)
+    parser.add_argument("--articleNumber", help="Article number to be replaced in the DOCX file", required=True)
+    parser.add_argument("--logo", help="Logo PNG file to be replaced in the DOCX file", required=True)
+    parser.add_argument("--manufacturerSpec", help="Manufacturer spec PDF file", required=True)
 
     args = parser.parse_args()
 
