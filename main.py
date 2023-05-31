@@ -6,6 +6,7 @@ from docx2pdf import convert
 from PyPDF2 import PdfFileMerger, PdfFileReader
 from PIL import Image
 import subprocess
+from PyPDF2 import PdfReader, PdfWriter
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -35,8 +36,6 @@ def edit_docx(template, article_number, logo):
 # def convert_to_pdf():
 #     convert('modified.docx', 'modified.pdf')
 
-import subprocess
-
 def convert_to_pdf(docx_file, pdf_file):
     command = f'libreoffice --headless --convert-to pdf:writer_pdf_Export --outdir . {docx_file}'
     subprocess.run(command, shell=True, stdout=subprocess.DEVNULL)
@@ -46,23 +45,24 @@ def convert_to_pdf(docx_file, pdf_file):
     #subprocess.run(f'mv {default_pdf_file} {pdf_file}', shell=True)
 
 def split_pdf(manufacturer_spec, article_number):
-    inputpdf = PdfFileReader(open("modified.pdf", "rb"))
+    inputpdf = PdfReader("modified.pdf")
 
     with open("front.pdf", "wb") as outputStream:
-        output = PdfFileMerger()
-        output.addPage(inputpdf.getPage(0))
+        output = PdfWriter()
+        output.add_page(inputpdf.pages[0])
         output.write(outputStream)
 
     with open("back.pdf", "wb") as outputStream:
-        output = PdfFileMerger()
-        output.addPage(inputpdf.getPage(1))
+        output = PdfWriter()
+        output.add_page(inputpdf.pages[1])
         output.write(outputStream)
 
-    output = PdfFileMerger()
-    output.append("front.pdf")
-    output.append(manufacturer_spec)
-    output.append("back.pdf")
-    output.write(f"Spec_{article_number}.pdf")
+    output = PdfWriter()
+    output.add_page(PdfReader("front.pdf").pages[0])
+    output.add_page(PdfReader(manufacturer_spec).pages[0])
+    output.add_page(PdfReader("back.pdf").pages[0])
+    with open(f"Spec_{article_number}.pdf", "wb") as outputStream:
+        output.write(outputStream)
 
 def main():
     template, article_number, logo, manufacturer_spec = get_args()
