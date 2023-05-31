@@ -1,5 +1,3 @@
 argparse
-python-docx
-docx2pdf
 PyPDF2
-Pillow
+python-docx

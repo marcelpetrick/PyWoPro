@@ -1,10 +1,11 @@
 import argparse
-from docx import Document # todo check how to satisfy requirements.txt
-import subprocess
-import re
-from PyPDF2 import PdfReader, PdfWriter
-import os
 import datetime
+import os
+import re
+import subprocess
+from docx import Document
+from PyPDF2 import PdfReader, PdfWriter
+
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -16,6 +17,7 @@ def get_args():
     args = parser.parse_args()
 
     return args.template, args.articleNumber, args.logo, args.manufacturerSpec
+
 
 def edit_docx(template, article_number, logo):
     doc = Document(template)
@@ -44,6 +46,7 @@ def edit_docx(template, article_number, logo):
 
     doc.save('modified.docx')
 
+
 def convert_to_pdf(docx_file):
     command = f'libreoffice --headless --convert-to pdf:writer_pdf_Export --outdir . {docx_file}'
     subprocess.run(command, shell=True, stdout=subprocess.DEVNULL)
@@ -68,8 +71,9 @@ def split_pdf(manufacturer_spec, article_number):
         output.add_page(page)
     output.add_page(PdfReader("back.pdf").pages[0])
 
-    with open(f"Spec_{article_number}.pdf", "wb") as outputStream:
+    with open(f"Spec_articleNumber_{article_number}.pdf", "wb") as outputStream:
         output.write(outputStream)
+
 
 def cleanup():
     files_to_delete = ['modified.pdf', 'modified.docx', 'front.pdf', 'back.pdf']
@@ -87,8 +91,10 @@ def main():
     split_pdf(manufacturer_spec, article_number)
     cleanup()
 
+
 if __name__ == "__main__":
     main()
+
 
 # time python3 main.py --template=template_front_and_back.docx --articleNumber=3.1415 --logo=fancy_logo.png --manufacturerSpec=manufacturer_spec.pdf
 
